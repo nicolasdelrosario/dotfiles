@@ -1,8 +1,9 @@
 # Dotfiles
 
-Estructura base para centralizar configuraciones personales y desplegarlas con `install.sh`.
+Personal dotfiles for macOS/Linux development environments, managed from a
+single repository and deployed with `install.sh`.
 
-## Estructura
+## Repository Layout
 
 ```text
 dotfiles/
@@ -22,31 +23,73 @@ dotfiles/
     └── .gitignore_global
 ```
 
-## Instalacion
+## Installation
 
-1. Clonar este repo en una ruta fija o en cualquier ruta local.
-2. Editar los archivos dentro de `dotfiles/`.
-3. Ejecutar:
+Clone this repository, review the files, then run:
 
 ```bash
 ./install.sh
 ```
 
-El script crea symlinks en el home del usuario y hace backup de archivos existentes antes de reemplazarlos.
+The installer creates symlinks from this repository into your home directory.
+If a target file already exists and is not the expected symlink, it is moved to
+a timestamped backup before the new symlink is created.
 
-## Que va en cada archivo
+Linked files:
 
-- `kitty/kitty.conf`: configuracion de Kitty.
-- `zsh/.zshrc`: configuracion de shell.
-- `tmux/.tmux.conf`: configuracion de Tmux.
-- `p10k/.p10k.zsh`: configuracion de Powerlevel10k.
-- `git/.gitconfig`: configuracion de Git portable.
-- `misc/.gitignore_global`: ignore global opcional.
+| Source | Target |
+| --- | --- |
+| `kitty/kitty.conf` | `~/.config/kitty/kitty.conf` |
+| `zsh/.zshrc` | `~/.zshrc` |
+| `tmux/.tmux.conf` | `~/.tmux.conf` |
+| `p10k/.p10k.zsh` | `~/.p10k.zsh` |
+| `git/.gitconfig` | `~/.gitconfig` |
+| `misc/.gitignore_global` | `~/.gitignore_global` |
 
-## Que no va en el repo
+## Requirements
 
-- Backups viejos de shell.
+The configuration assumes these tools when available:
+
+- `zsh`
+- Oh My Zsh
+- Powerlevel10k
+- `tmux` and TPM (`~/.tmux/plugins/tpm`)
+- Kitty
+- `git`
+- Optional CLI tools used by aliases and shell integrations: `fzf`, `fd`, `bat`,
+  `tree`, `zoxide`, `atuin`, `nvim`, `lazygit`, `docker`, `kubectl`, `kubectx`,
+  `kubens`, `direnv`, `bpytop`, and `cmatrix`
+
+Optional integrations are guarded where practical, so a missing optional tool
+should not prevent the shell from starting.
+
+## Validation
+
+Useful checks after editing:
+
+```bash
+bash -n install.sh
+zsh -n zsh/.zshrc
+git config --file git/.gitconfig --list
+HOME=/tmp/dotfiles-test-home ./install.sh
+tmux -f tmux/.tmux.conf start-server
+```
+
+The temporary `HOME` command verifies the installer without touching your real
+home directory.
+
+## What Belongs Here
+
+- `kitty/kitty.conf`: Kitty terminal configuration.
+- `zsh/.zshrc`: interactive shell configuration.
+- `tmux/.tmux.conf`: Tmux configuration and plugin list.
+- `p10k/.p10k.zsh`: Powerlevel10k prompt configuration.
+- `git/.gitconfig`: portable Git configuration.
+- `misc/.gitignore_global`: optional global Git ignore rules.
+
+## What Does Not Belong Here
+
+- Old shell backups.
 - `~/.oh-my-zsh/`
 - `~/.tmux/plugins/`
-- Toolchains como `~/.nvm/`, `~/.sdkman/` o `~/.bun/`
-
+- Toolchains such as `~/.nvm/`, `~/.sdkman/`, or `~/.bun/`

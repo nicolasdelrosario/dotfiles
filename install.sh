@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-repo_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+repo_dir="$(CDPATH='' cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 home_dir="${HOME}"
 
 link_file() {
@@ -14,16 +14,17 @@ link_file() {
   fi
 
   local target_dir
-  target_dir="$(dirname -- "$target")"
+  target_dir="$(dirname "$target")"
   mkdir -p "$target_dir"
 
   if [ -e "$target" ] || [ -L "$target" ]; then
-    if [ -L "$target" ] && [ "$(readlink -- "$target")" = "$source" ]; then
+    if [ -L "$target" ] && [ "$(readlink "$target")" = "$source" ]; then
       echo "ok: $target already linked"
       return 0
     fi
 
-    local backup="${target}.backup.$(date +%Y%m%d%H%M%S)"
+    local backup
+    backup="${target}.backup.$(date +%Y%m%d%H%M%S)"
     mv "$target" "$backup"
     echo "backup: $target -> $backup"
   fi
@@ -38,4 +39,3 @@ link_file "$repo_dir/tmux/.tmux.conf" "$home_dir/.tmux.conf"
 link_file "$repo_dir/p10k/.p10k.zsh" "$home_dir/.p10k.zsh"
 link_file "$repo_dir/git/.gitconfig" "$home_dir/.gitconfig"
 link_file "$repo_dir/misc/.gitignore_global" "$home_dir/.gitignore_global"
-
