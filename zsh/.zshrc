@@ -6,11 +6,12 @@ fi
 # Oh My Zsh configuration
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
+# Load completions from Ubuntu/Debian's official zsh-completions package.
+[[ -d /usr/share/zsh/vendor-completions ]] && fpath=(/usr/share/zsh/vendor-completions $fpath)
 plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 [[ -f "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
 
 # Environment
-export TERM=xterm-256color
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export LC_CTYPE=en_US.UTF-8
@@ -23,7 +24,6 @@ export BAT_THEME="Catppuccin Mocha"
 
 # Aliases
 alias v="nvim"
-alias t="tmux attach -t 0 || tmux -u"
 alias fzfp='fzf --preview="bat --color=always {}"'
 alias fzfv='nvim $(fzf --preview="bat --color=always {}")'
 alias fzfcd='cd "$(fd --type d --hidden --exclude .git | fzf --preview="tree -C {} | head -100")"'
@@ -33,7 +33,21 @@ alias matrix="cmatrix"
 # navigation
 cx() { cd "$@" && ls -la; }
 fcd() { cd "$(find . -type d -not -path '*/.*' | fzf)" && ls -la; }
-f() { echo "$(find . -type f -not -path '*/.*' | fzf)" | pbcopy }
+copy_to_clipboard() {
+  if command -v pbcopy >/dev/null 2>&1; then
+    pbcopy
+  elif command -v wl-copy >/dev/null 2>&1; then
+    wl-copy
+  elif command -v xclip >/dev/null 2>&1; then
+    xclip -selection clipboard
+  elif command -v xsel >/dev/null 2>&1; then
+    xsel --clipboard --input
+  else
+    cat >/dev/null
+    return 1
+  fi
+}
+f() { find . -type f -not -path '*/.*' | fzf | copy_to_clipboard; }
 fv() { nvim "$(find . -type f -not -path '*/.*' | fzf)" }
 
 # Git
@@ -86,18 +100,6 @@ alias kns="kubens"
 alias ke="kubectl exec -it"
 alias kcns='kubectl config set-context --current --namespace'
 
-# Functions
-tat() {
-  name=$(basename `pwd` | sed -e 's/\.//g')
-  if tmux ls 2>&1 | grep "$name"; then
-    tmux attach -t "$name"
-  elif [ -f .envrc ]; then
-    direnv exec / tmux new-session -s "$name"
-  else
-    tmux new-session -s "$name"
-  fi
-}
-
 scroll-and-clear-screen() {
     printf '\n%.0s' {1..$LINES}
     zle clear-screen
@@ -131,3 +133,6 @@ export PATH="$HOME/.opencode/bin:$PATH"
 
 # Codex
 export PATH="$HOME/.local/bin:$PATH"
+
+# npm global binaries
+export PATH="$HOME/.npm-global/bin:$PATH"
