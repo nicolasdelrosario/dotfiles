@@ -1,7 +1,7 @@
 ---
 description: Review changes for bugs, regressions, and missing tests without editing files.
 mode: subagent
-model: opencode/big-pickle
+model: opencode/deepseek-v4-flash-free
 permission:
   edit: deny
   bash: deny

@@ -1,7 +1,7 @@
 ---
 description: Explore the codebase and return concise, evidence-based findings without changing files.
 mode: subagent
-model: opencode/big-pickle
+model: opencode/deepseek-v4-flash-free
 permission:
   edit: deny
   bash: deny
