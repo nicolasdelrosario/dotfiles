@@ -5,8 +5,7 @@
   "plugin": [
     "./plugins/ponytail-fixed.mjs",
     "./plugins/engram.ts",
-    "./plugins/rtk.ts",
-    "opencode-model-router"
+    "./plugins/rtk.ts"
   ],
   "mcp": {
     "engram": { "command": ["engram", "mcp", "--tools=agent"], "enabled": true, "type": "local" },

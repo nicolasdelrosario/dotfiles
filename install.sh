@@ -54,6 +54,9 @@ link_file "$repo_dir/p10k/.p10k.zsh" "$home_dir/.p10k.zsh"
 link_file "$repo_dir/git/.gitconfig" "$home_dir/.gitconfig"
 link_file "$repo_dir/misc/.gitignore_global" "$home_dir/.gitignore_global"
 
+link_file "$repo_dir/codex/config.toml" "$home_dir/.codex/config.toml"
+link_file "$repo_dir/codex/AGENTS.md" "$home_dir/.codex/AGENTS.md"
+
 link_file "$repo_dir/opencode/opencode.jsonc" "$config_dir/opencode/opencode.jsonc"
 link_file "$repo_dir/opencode/tui.json" "$config_dir/opencode/tui.json"
 link_file "$repo_dir/opencode/AGENTS.md" "$config_dir/opencode/AGENTS.md"
@@ -66,11 +69,13 @@ for skill in "$repo_dir"/opencode/skills/*; do
   [ -e "$skill" ] || continue
   link_file "$skill" "$config_dir/opencode/skills/$(basename "$skill")"
 done
-for directory in command; do
+for directory in command agents; do
   [ -d "$repo_dir/opencode/$directory" ] || continue
   link_file "$repo_dir/opencode/$directory" "$config_dir/opencode/$directory"
 done
 
 if command -v npm >/dev/null 2>&1 && [ -f "$repo_dir/opencode/package.json" ] && ! "$dry_run"; then
-  npm install --prefix "$config_dir/opencode" --ignore-scripts --no-audit --no-fund
+  # Plugins are symlinked from the repository, so dependencies must resolve
+  # from the source tree rather than only from the deployed config directory.
+  npm ci --prefix "$repo_dir/opencode" --ignore-scripts --no-audit --no-fund
 fi
