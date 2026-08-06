@@ -52,8 +52,6 @@ link_file "$repo_dir/kitty/kitty.conf" "$config_dir/kitty/kitty.conf"
 link_file "$repo_dir/zsh/.zshrc" "$home_dir/.zshrc"
 link_file "$repo_dir/p10k/.p10k.zsh" "$home_dir/.p10k.zsh"
 link_file "$repo_dir/git/.gitconfig" "$home_dir/.gitconfig"
-link_file "$repo_dir/misc/.gitignore_global" "$home_dir/.gitignore_global"
-
 link_file "$repo_dir/codex/config.toml" "$home_dir/.codex/config.toml"
 link_file "$repo_dir/codex/AGENTS.md" "$home_dir/.codex/AGENTS.md"
 

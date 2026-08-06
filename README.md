@@ -7,6 +7,7 @@ single repository and deployed with `install.sh`.
 
 ```text
 dotfiles/
+├── .gitignore
 ├── README.md
 ├── install.sh
 ├── bootstrap-ubuntu.sh
@@ -17,7 +18,18 @@ dotfiles/
 │   │   ├── explorer.md
 │   │   ├── implementer.md
 │   │   └── reviewer.md
-│   └── opencode.jsonc
+│   ├── command/
+│   │   └── ponytail.md
+│   ├── plugins/
+│   │   ├── engram.ts
+│   │   ├── ponytail-fixed.mjs
+│   │   └── rtk.ts
+│   ├── skills/
+│   │   └── find-skills/SKILL.md
+│   ├── AGENTS.md
+│   ├── opencode.jsonc
+│   ├── package.json
+│   └── tui.json
 ├── codex/
 ├── zsh/
 │   └── .zshrc
@@ -27,8 +39,8 @@ dotfiles/
 │   └── .p10k.zsh
 ├── git/
 │   └── .gitconfig
-└── misc/
-    └── .gitignore_global
+└── docs/
+    └── terminal.md
 ```
 
 ## Installation
@@ -56,7 +68,7 @@ macOS restore (Homebrew required):
 Use `./install.sh --dry-run` to preview links and backups without changing
 files. `XDG_CONFIG_HOME` controls the Kitty config location (default:
 `~/.config`). Existing targets are backed up without overwriting earlier
-backups.
+backups. The same variable controls Kitty and OpenCode config locations.
 
 The installer creates symlinks from this repository into your home directory.
 If a target file already exists and is not the expected symlink, it is moved to
@@ -70,12 +82,15 @@ Linked files:
 | `zsh/.zshrc` | `~/.zshrc` |
 | `p10k/.p10k.zsh` | `~/.p10k.zsh` |
 | `git/.gitconfig` | `~/.gitconfig` |
-| `misc/.gitignore_global` | `~/.gitignore_global` |
 | `codex/config.toml` | `~/.codex/config.toml` |
 | `codex/AGENTS.md` | `~/.codex/AGENTS.md` |
 | `opencode/opencode.jsonc` | `~/.config/opencode/opencode.jsonc` |
+| `opencode/tui.json` | `~/.config/opencode/tui.json` |
 | `opencode/AGENTS.md` | `~/.config/opencode/AGENTS.md` |
 | `opencode/package.json` | `~/.config/opencode/package.json` |
+| `opencode/plugins/*` | `~/.config/opencode/plugins/` |
+| `opencode/skills/*` | `~/.config/opencode/skills/` |
+| `opencode/command/` | `~/.config/opencode/command/` |
 | `opencode/agents/` | `~/.config/opencode/agents/` |
 
 ## Requirements
@@ -115,7 +130,7 @@ Main Kitty shortcuts:
 | `Ctrl+Shift+H/J/K/L` | Move between windows |
 | `Ctrl+Shift+Q` | Close window |
 | `Ctrl+Shift+E` | Equalize windows |
-| `Ctrl+Shift+M` | Maximize/restore window |
+| `Ctrl+Shift+M` | Alternar layout apilado |
 | `Ctrl+Alt+H/J/K/L` | Resize window |
 | `Ctrl+Shift+C/V` | Copy/paste |
 | `Ctrl+Shift+P/F/U` | Scrollback pager/search/URL hints |
@@ -124,6 +139,9 @@ Main Kitty shortcuts:
 `Enter` y `Backspace` quedan libres: ya no se usan para crear splits.
 Consulta el [cheat sheet de terminal](docs/terminal.md) para el flujo diario y
 los comandos opcionales disponibles.
+
+Kitty remains the current machine configuration, including its Rosé Pine theme,
+font, shell integration, behavior, and shortcuts.
 
 ## Validation
 
@@ -146,13 +164,7 @@ home directory.
 - `zsh/.zshrc`: interactive shell configuration.
 - `p10k/.p10k.zsh`: Powerlevel10k prompt configuration.
 - `git/.gitconfig`: portable Git configuration.
-- `misc/.gitignore_global`: optional global Git ignore rules.
 
-## What Does Not Belong Here
-
-- Old shell backups.
-- `~/.oh-my-zsh/`
-- Toolchains such as `~/.nvm/`, `~/.sdkman/`, or `~/.bun/`
 ## Ubuntu bootstrap
 
 Requirements: Ubuntu or Debian, an interactive `sudo` account, and a network connection. The script does not change the default shell and never stores passwords.
@@ -183,7 +195,7 @@ source install is intentional: plugin symlinks resolve npm dependencies from
 their real path in this repository. OpenCode resolves `engram`, `codegraph`,
 and `rtk` through `PATH`.
 
-Luna is the primary OpenCode agent. Native subagents use Big Pickle for free
+Luna is the primary OpenCode agent. Native subagents use DeepSeek for free
 exploration and review, Luna for implementation, and Terra only for difficult
 architecture or debugging work.
 
@@ -191,8 +203,8 @@ architecture or debugging work.
 
 The configured stack is deliberately small and role-based:
 
-- `explorer`: read-only codebase discovery with `opencode/big-pickle`.
-- `reviewer`: read-only correctness review with `opencode/big-pickle`.
+- `explorer`: read-only codebase discovery with `opencode/deepseek-v4-flash-free`.
+- `reviewer`: read-only correctness review with `opencode/deepseek-v4-flash-free`.
 - `implementer`: focused edits and tests with Luna; cannot delegate.
 - `architect`: read-only difficult architecture analysis with Terra; use sparingly.
 - Ponytail: prompt rules, `/ponytail`, and related skills.
@@ -200,10 +212,6 @@ The configured stack is deliberately small and role-based:
 - CodeGraph: local symbol/call-graph MCP, used only when a repo has `.codegraph/`.
 - Context7: remote documentation MCP for current library/API references.
 - RTK: external command rewriter that reduces shell output tokens.
-
-Sleeve is not part of the required stack. Its provider block is an optional
-escape hatch for `anthropic/...` models only; leave `SLEEVE_GATEWAY_URL` unset
-unless that gateway is explicitly needed.
 
 ### OpenCode dependencies
 
@@ -236,24 +244,4 @@ check should list `config`, `command.execute.before`, and
 
 This repository intentionally excludes OpenCode sessions, auth/credentials,
 Engram databases, logs, caches, `node_modules`, and machine-specific proxy
-details. Kitty remains the current machine configuration, including its Rosé
-Pine theme, font, shell integration, behavior, and shortcuts.
-# Dependencies
-
-This repository contains configuration only; it includes no OpenCode sessions,
-authentication credentials, or Engram memory database. Install these external
-dependencies separately and ensure they are on `PATH`:
-
-- `engram` (the `engram mcp --tools=agent` command)
-- `codegraph` (the `codegraph serve --mcp` command)
-- `rtk` (the RTK command-line tool)
-- OpenCode plus npm packages `@opencode-ai/plugin@1.18.5`,
-  `@dietrichgebert/ponytail@4.8.4`, and
-  `opencode-subagent-statusline@1.2.1` (installed by `install.sh`)
-- `opencode/tui.json` keeps the default statusline; the optional
-  `opencode-subagent-statusline` package remains installed for future use.
-- Optional Sleeve gateway: set `SLEEVE_GATEWAY_URL` only when using an
-  `anthropic/...` model through that gateway.
-
-Engram, CodeGraph, RTK, the model router, statusline, and Sleeve are not
-vendored here. No sessions, auth, or memory DB are included.
+details.
