@@ -1,0 +1,22 @@
+model = "gpt-5.6-luna"
+model_reasoning_effort = "medium"
+approvals_reviewer = "user"
+
+[features]
+multi_agent = true
+js_repl = false
+
+[agents]
+max_depth = 2
+max_threads = 4
+
+[mcp_servers.codegraph]
+command = "codegraph"
+args = ["serve", "--mcp"]
+
+[mcp_servers.engram]
+command = "engram"
+args = ["mcp", "--tools=agent"]
+
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"
